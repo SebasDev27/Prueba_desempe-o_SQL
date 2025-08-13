@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRUD Transactions</title>
+  <!-- Bootstrap CSS for styling -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+
+  <h1 class="mb-4">Gestión de Transacciones</h1>
+
+  <!-- Transaction Form: Used for creating and editing transactions -->
+  <form id="transactionForm" class="mb-4">
+    <!-- Hidden input to store transaction ID for editing -->
+    <input type="hidden" id="transaction_id">
+    <div class="mb-3">
+      <label class="form-label">Código</label>
+      <!-- Transaction code input -->
+      <input type="text" class="form-control" id="transaction_code" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Fecha</label>
+      <!-- Transaction date input -->
+      <input type="datetime-local" class="form-control" id="transaction_date" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Monto</label>
+      <!-- Amount input -->
+      <input type="number" class="form-control" id="amount" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Estado</label>
+      <!-- Status selector -->
+      <select id="status" class="form-select" required>
+        <option value="pending">Pendiente</option>
+        <option value="completed">Completada</option>
+        <option value="failed">Fallida</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Tipo de Transacción</label>
+      <!-- Transaction type input -->
+      <input type="text" class="form-control" id="transaction_type" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Platform ID</label>
+      <!-- Platform ID input -->
+      <input type="number" class="form-control" id="platform_id" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Invoice ID</label>
+      <!-- Invoice ID input -->
+      <input type="number" class="form-control" id="invoice_id" required>
+    </div>
+    <!-- Save and Cancel buttons -->
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" onclick="resetForm()">Cancelar</button>
+  </form>
+
+  <!-- Transactions Table: Displays all transactions -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Código</th>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Estado</th>
+        <th>Tipo</th>
+        <th>Platformas</th>
+        <th></th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="transactionsTable"></tbody>
+  </table>
+
+  <script>
+    // API endpoint for transactions
+    const API_URL = 'http://localhost:3000/transactions';
+
+    // Load transactions when the page loads
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+
+    // Fetch and display all transactions in the table
+    async function loadTransactions() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tbody = document.getElementById('transactionsTable');
+      tbody.innerHTML = '';
+      data.forEach(tr => {
+        // Render each transaction row with Edit and Delete buttons
+        tbody.innerHTML += `
+          <tr>
+            <td>${tr.transaction_id}</td>
+            <td>${tr.transaction_code}</td>
+            <td>${tr.transaction_date}</td>
+            <td>${tr.amount}</td>
+            <td>${tr.status}</td>
+            <td>${tr.transaction_type}</td>
+            <td>${tr.platform_id}</td>
+            <td>${tr.invoice_id}</td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick='editTransaction(${JSON.stringify(tr)})'>Editar</button>
+              <button class="btn btn-danger btn-sm" onclick='deleteTransaction(${tr.transaction_id})'>Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Handle form submission for creating or updating a transaction
+    document.getElementById('transactionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('transaction_id').value;
+      const transaction = {
+        transaction_code: document.getElementById('transaction_code').value,
+        transaction_date: document.getElementById('transaction_date').value,
+        amount: document.getElementById('amount').value,
+        status: document.getElementById('status').value,
+        transaction_type: document.getElementById('transaction_type').value,
+        platform_id: document.getElementById('platform_id').value,
+        invoice_id: document.getElementById('invoice_id').value
+      };
+
+      // If ID exists, update transaction; otherwise, create new
+      if (id) {
+        await fetch(`${API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transaction)
+        });
+      } else {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transaction)
+        });
+      }
+      resetForm();
+      loadTransactions();
+    });
+
+    // Fill the form with transaction data for editing
+    function editTransaction(tr) {
+      document.getElementById('transaction_id').value = tr.transaction_id;
+      document.getElementById('transaction_code').value = tr.transaction_code;
+      document.getElementById('transaction_date').value = tr.transaction_date.replace(' ', 'T');
+      document.getElementById('amount').value = tr.amount;
+      document.getElementById('status').value = tr.status;
+      document.getElementById('transaction_type').value = tr.transaction_type;
+      document.getElementById('platform_id').value = tr.platform_id;
+      document.getElementById('invoice_id').value = tr.invoice_id;
+    }
+
+    // Delete a transaction by ID
+    async function deleteTransaction(id) {
+      if (confirm('¿Seguro que quieres eliminar esta transacción?')) {
+        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        loadTransactions();
+      }
+    }
+
+    // Reset the form fields and clear transaction ID
+    function resetForm() {
+      document.getElementById('transactionForm').reset();
+      document.getElementById('transaction_id').value = '';
+    }
+  </script>
+</body>
+</html>

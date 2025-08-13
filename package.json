@@ -20,8 +20,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
     "express": "^5.1.0",
     "mysql2": "^3.14.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebasDev27/Prueba_desempe-o_SQL.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SebasDev27/Prueba_desempe-o_SQL/issues"
+  },
+  "homepage": "https://github.com/SebasDev27/Prueba_desempe-o_SQL#readme"
 }

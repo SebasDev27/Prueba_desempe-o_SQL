@@ -12,7 +12,7 @@ export async function loadCustomers() {
         .on('data', (row) => {
             customerss.push([
                 row.customer_id,
-                row.fullname,
+                row.full_name,
                 row.id_number,
                 row.address,
                 row.phone,
@@ -44,7 +44,7 @@ export async function loadPlataforms(){
         fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (fila) => {
-                books.push([
+                platforms.push([
                     fila.platform_id,
                     fila.platform_name
                 ]);
@@ -74,7 +74,7 @@ export async function loadInvoices() {
         fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
-            loans.push([
+            invoices.push([
                 row.invoice_id,
                 row.invoice_number,
                 row.billing_period,
@@ -110,7 +110,7 @@ export async function loadTransactions() {
         .on('data', (row) => {
             transactions.push([
                 row.transaction_id,
-                row.ransaction_code,
+                row.transaction_code,
                 row.transaction_date,
                 row.amount,
                 row.status,

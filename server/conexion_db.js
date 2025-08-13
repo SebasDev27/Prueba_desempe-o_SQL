@@ -3,8 +3,8 @@ import mysql from 'mysql2/promise';
 export const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'Tixnn2127*',
-    database: 'pd_sebastian_marriaga_caiman',
+    password: '',
+    database: 'pd_sebastian_marriaga_hoyos_caiman',
 });
 
 
